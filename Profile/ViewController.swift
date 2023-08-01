@@ -188,7 +188,7 @@ class ViewController: UIViewController {
         
         private func loadData() {
             // Загружаем данные и обновляем dataSource
-            dataSource.data = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"]
+            dataSource.data = ["MVVM+C", "MVVM", "Viper", "Git", "Swift"]
             collectionView.reloadData()
         }
     class MyDataSource: NSObject, UICollectionViewDataSource {
@@ -205,33 +205,7 @@ class ViewController: UIViewController {
         }
         
     }
-    class MyCell: UICollectionViewCell {
-        let textLabel = UILabel()
-        let deleteButton = UIButton(type: .system)
-
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            setupViews()
-        }
-        
-        required init?(coder aDecoder: NSCoder) {
-            super.init(coder: aDecoder)
-            setupViews()
-        }
-
-        private func setupViews() {
-            textLabel.translatesAutoresizingMaskIntoConstraints = false
-            deleteButton.translatesAutoresizingMaskIntoConstraints = false
-            
-            contentView.addSubview(textLabel)
-            
-            NSLayoutConstraint.activate([
-                textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-                textLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            ])
-            
-        }
-    }
+   
     private func deleteAction(for indexPath: IndexPath) -> UIContextualAction {
         let action = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completion) in
             if self?.isDeleteEnabled == false {
@@ -284,3 +258,30 @@ class ViewController: UIViewController {
 
 }
 
+class MyCell: UICollectionViewCell {
+    let textLabel = UILabel()
+    let deleteButton = UIButton(type: .system)
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupViews()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupViews()
+    }
+
+    private func setupViews() {
+        textLabel.translatesAutoresizingMaskIntoConstraints = false
+        deleteButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        contentView.addSubview(textLabel)
+        
+        NSLayoutConstraint.activate([
+            textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            textLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+        ])
+        
+    }
+}
