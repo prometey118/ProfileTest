@@ -98,17 +98,23 @@ class ViewController: UIViewController {
     }
 
     private func setupCollectionView() {
-            let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
-                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                      heightDimension: .fractionalHeight(1.0))
-                let item = NSCollectionLayoutItem(layoutSize: itemSize)
-                
-                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
-                                                       heightDimension: .fractionalWidth(0.2)) // Здесь устанавливаем высоту группы как 1/5 часть экрана
-                
-                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
-                
+        let layout = UICollectionViewCompositionalLayout { (sectionIndex, _) -> NSCollectionLayoutSection? in
+                let layoutSize = NSCollectionLayoutSize(
+                    widthDimension: .estimated(100),
+                    heightDimension: .absolute(32)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(
+                    layoutSize: .init(
+                        widthDimension: .fractionalWidth(1.0),
+                        heightDimension: layoutSize.heightDimension
+                    ),
+                    subitems: Array(repeating: .init(layoutSize: layoutSize), count: 6) // Repeat the layoutSize 6 times
+                )
+                group.interItemSpacing = .fixed(12)
+
                 let section = NSCollectionLayoutSection(group: group)
+                section.contentInsets = .init(top: 0, leading: 16, bottom: 0, trailing: 16)
+                section.interGroupSpacing = 12
                 return section
             }
             
@@ -125,6 +131,21 @@ class ViewController: UIViewController {
                     collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
                     collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5) // Здесь collectionView будет занимать половину высоты экрана
                 ])
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
+                collectionView.addGestureRecognizer(tapGestureRecognizer)
+        }
+    @objc private func handleTap(_ sender: UITapGestureRecognizer) {
+            // Get the tapped point in the collection view
+            let tapLocation = sender.location(in: collectionView)
+
+            // Find the item index that was tapped
+            if let indexPath = collectionView.indexPathForItem(at: tapLocation) {
+                // Remove the tapped item from the data source
+                dataSource.data.remove(at: indexPath.item)
+
+                // Update the collection view
+                collectionView.deleteItems(at: [indexPath])
+            }
         }
         
         private func loadData() {
@@ -142,18 +163,9 @@ class ViewController: UIViewController {
         func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath) as! MyCell
             cell.textLabel.text = data[indexPath.item]
-            cell.deleteButton.tag = indexPath.item
-            cell.deleteButton.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
             return cell
         }
         
-        @objc private func deleteButtonTapped(_ sender: UIButton) {
-            let index = sender.tag
-            if index < data.count {
-                data.remove(at: index) // Удаление элемента из массива
-//                collectionView?.deleteItems(at: [IndexPath(item: index, section: 0)]) // Обновление collectionView
-            }
-        }
     }
     class MyCell: UICollectionViewCell {
         let textLabel = UILabel()
@@ -175,17 +187,12 @@ class ViewController: UIViewController {
             deleteButton.translatesAutoresizingMaskIntoConstraints = false
             
             contentView.addSubview(textLabel)
-            contentView.addSubview(deleteButton)
             
             NSLayoutConstraint.activate([
                 textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
                 textLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-                
-                deleteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-                deleteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
             ])
             
-            deleteButton.setTitle("Удалить", for: .normal)
         }
     }
 
