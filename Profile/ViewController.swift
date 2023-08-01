@@ -11,6 +11,7 @@ class ViewController: UIViewController {
     private var collectionView: UICollectionView!
         private var dataSource: MyDataSource!
     private var isDeleteEnabled = false
+    private var deleteButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         let headText: UILabel = {
@@ -100,28 +101,31 @@ class ViewController: UIViewController {
     }
 
     private func setupDeleteButton() {
-            let deleteButton = UIButton(type: .system)
-            deleteButton.setTitle("Удалить элементы", for: .normal)
-            deleteButton.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
-            deleteButton.translatesAutoresizingMaskIntoConstraints = false
-            
-            view.addSubview(deleteButton)
-            
-            NSLayoutConstraint.activate([
-                deleteButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-                deleteButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
-            ])
-        }
+           deleteButton = UIButton(type: .system)
+           deleteButton.setTitle("Удалить элементы", for: .normal)
+           deleteButton.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
+           deleteButton.translatesAutoresizingMaskIntoConstraints = false
+
+           view.addSubview(deleteButton)
+
+           NSLayoutConstraint.activate([
+               deleteButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+               deleteButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
+           ])
+       }
     
     @objc private func deleteButtonTapped() {
-            isDeleteEnabled = !isDeleteEnabled
-            if isDeleteEnabled {
-                navigationItem.rightBarButtonItem?.title = "Отменить"
-            } else {
-                navigationItem.rightBarButtonItem?.title = "Удалить"
-            }
-            collectionView.reloadData()
+        isDeleteEnabled = !isDeleteEnabled
+        if isDeleteEnabled {
+            deleteButton.setTitle("Отменить", for: .normal)
+        } else {
+            deleteButton.setTitle("Удалить элементы", for: .normal)
         }
+        // Обновляем кнопку напрямую
+        deleteButton.setNeedsLayout()
+        deleteButton.layoutIfNeeded()
+        collectionView.reloadData()
+    }
     
     private func setupCollectionView() {
         let layout = UICollectionViewCompositionalLayout { (sectionIndex, _) -> NSCollectionLayoutSection? in
@@ -161,18 +165,24 @@ class ViewController: UIViewController {
                 collectionView.addGestureRecognizer(tapGestureRecognizer)
         }
     @objc private func handleTap(_ sender: UITapGestureRecognizer) {
-            // Get the tapped point in the collection view
-            let tapLocation = sender.location(in: collectionView)
+        // Get the tapped point in the collection view
+        let tapLocation = sender.location(in: collectionView)
 
-            // Find the item index that was tapped
-            if let indexPath = collectionView.indexPathForItem(at: tapLocation) {
+        // Find the item index that was tapped
+        if let indexPath = collectionView.indexPathForItem(at: tapLocation) {
+            if isDeleteEnabled {
                 // Remove the tapped item from the data source
                 dataSource.data.remove(at: indexPath.item)
 
                 // Update the collection view
                 collectionView.deleteItems(at: [indexPath])
+            } else {
+                // Perform any other action when delete is not enabled
+                // For example, you can show a detail view or do nothing
+                print("Tap on item at index: \(indexPath.item)")
             }
         }
+    }
         
         private func loadData() {
             // Загружаем данные и обновляем dataSource
@@ -222,18 +232,18 @@ class ViewController: UIViewController {
         }
     }
     private func deleteAction(for indexPath: IndexPath) -> UIContextualAction {
-           let action = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completion) in
-               if self?.isDeleteEnabled == true {
-                   // Удалите элемент из источника данных
-                   self?.dataSource.data.remove(at: indexPath.item)
+        let action = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completion) in
+            if self?.isDeleteEnabled == true {
+                // Удалите элемент из источника данных
+                self?.dataSource.data.remove(at: indexPath.item)
 
-                   // Обновите коллекцию
-                   self?.collectionView.deleteItems(at: [indexPath])
-               }
-               completion(true)
-           }
-           return action
-       }
+                // Обновите коллекцию
+                self?.collectionView.deleteItems(at: [indexPath])
+            }
+            completion(true)
+        }
+        return action
+    }
 
        // Реализуйте делегат UICollectionViewDelegate для отображения свайпов
        func collectionView(_ collectionView: UICollectionView, trailingSwipeActionsConfigurationForItemAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
