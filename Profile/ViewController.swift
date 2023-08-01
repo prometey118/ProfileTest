@@ -15,7 +15,7 @@ class ViewController: UIViewController {
             label.translatesAutoresizingMaskIntoConstraints = false
             label.numberOfLines = 0
             label.text = "Профиль"
-            label.font = UIFont(name: "SFProDisplay-Bold", size: 16)
+            label.font = UIFont.systemFont(ofSize: 20)
             label.textColor = .black
             var paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.lineHeightMultiple = 1.05
@@ -34,22 +34,40 @@ class ViewController: UIViewController {
             layer0.bounds = view.bounds
             layer0.position = view.center
             view.layer.addSublayer(layer0)
+            view.backgroundColor = .blue
             view.translatesAutoresizingMaskIntoConstraints = false
             return view
         }()
         let name: UILabel = {
             let label = UILabel()
-            label.text = "Савин Ярослав"
+            label.translatesAutoresizingMaskIntoConstraints = false
+            label.numberOfLines = 2
+            label.text = "Савин Ярослав Николаевич"
+            label.font = UIFont.systemFont(ofSize: 30)
+            var paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineHeightMultiple = 1.05
+            label.textAlignment = .center
+
+//            label.frame = CGRect(x: 0, y: 0, width: 149, height: 64)
+
             return label
         }()
+
         view.addSubview(headText)
         view.addSubview(image)
+        view.addSubview(name)
+
+        
         
         headText.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         headText.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         headText.topAnchor.constraint(equalTo: view.topAnchor, constant: 62).isActive = true
         image.topAnchor.constraint(equalTo: headText.bottomAnchor, constant: 50).isActive = true
         image.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -60).isActive = true
+        name.topAnchor.constraint(equalTo: image.bottomAnchor, constant: 150).isActive = true
+        name.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        name.widthAnchor.constraint(equalToConstant: 350).isActive = true
+
         
         
         
