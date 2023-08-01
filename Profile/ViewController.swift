@@ -15,6 +15,7 @@ class ViewController: UIViewController {
     private var addButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.layer.backgroundColor = UIColor(red: 0.953, green: 0.953, blue: 0.961, alpha: 1).cgColor
         let headText: UILabel = {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
@@ -235,7 +236,7 @@ class ViewController: UIViewController {
     }
     private func deleteAction(for indexPath: IndexPath) -> UIContextualAction {
         let action = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completion) in
-            if self?.isDeleteEnabled == true {
+            if self?.isDeleteEnabled == false {
                 self?.dataSource.data.remove(at: indexPath.item)
 
                 self?.collectionView.deleteItems(at: [indexPath])
@@ -285,3 +286,23 @@ class ViewController: UIViewController {
 
 }
 
+class HeaderView: UICollectionReusableView {
+    let titleLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.boldSystemFont(ofSize: 24)
+        label.textColor = .black
+        return label
+    }()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        addSubview(titleLabel)
+        titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
+        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+}
