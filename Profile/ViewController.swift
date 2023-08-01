@@ -23,8 +23,6 @@ class ViewController: UIViewController {
             label.text = "Профиль"
             label.font = UIFont.systemFont(ofSize: 20)
             label.textColor = .black
-            var paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineHeightMultiple = 1.05
             label.textAlignment = .center
             return label
         }()
@@ -286,23 +284,3 @@ class ViewController: UIViewController {
 
 }
 
-class HeaderView: UICollectionReusableView {
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = UIFont.boldSystemFont(ofSize: 24)
-        label.textColor = .black
-        return label
-    }()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        addSubview(titleLabel)
-        titleLabel.centerXAnchor.constraint(equalTo: centerXAnchor).isActive = true
-        titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-}
