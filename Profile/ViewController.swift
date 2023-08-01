@@ -14,20 +14,23 @@ class ViewController: UIViewController {
             let label = UILabel()
             label.translatesAutoresizingMaskIntoConstraints = false
             label.numberOfLines = 0
-            label.text = "asc"
+            label.text = "Профиль"
             label.font = UIFont.systemFont(ofSize: 30, weight: .medium)
             label.textColor = .black
-            label.contentMode = .center
+            label.backgroundColor = .green
+            label.textAlignment = .center
+            
             
             return label
         }()
-        // Do any additional setup after loading the view.
+        
+        
         view.addSubview(headText)
         
-        headText.leftAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
-        headText.rightAnchor.constraint(equalTo: self.view.leftAnchor).isActive = true
-        headText.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
-        headText.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
+        headText.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        headText.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
+        headText.topAnchor.constraint(equalTo: view.topAnchor, constant: 45).isActive = true
+        
         
         
     }
