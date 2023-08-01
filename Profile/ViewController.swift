@@ -12,6 +12,7 @@ class ViewController: UIViewController {
         private var dataSource: MyDataSource!
     private var isDeleteEnabled = false
     private var deleteButton: UIButton!
+    private var addButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         let headText: UILabel = {
@@ -101,18 +102,25 @@ class ViewController: UIViewController {
     }
 
     private func setupDeleteButton() {
-           deleteButton = UIButton(type: .system)
-           deleteButton.setTitle("Удалить элементы", for: .normal)
-           deleteButton.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
-           deleteButton.translatesAutoresizingMaskIntoConstraints = false
+            deleteButton = UIButton(type: .system)
+            deleteButton.setTitle("Удалить элементы", for: .normal)
+            deleteButton.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)
 
-           view.addSubview(deleteButton)
+            addButton = UIButton(type: .system)
+            addButton.setTitle("Добавить элементы", for: .normal)
+            addButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
 
-           NSLayoutConstraint.activate([
-               deleteButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-               deleteButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
-           ])
-       }
+            let stackView = UIStackView(arrangedSubviews: [deleteButton, addButton])
+            stackView.axis = .vertical
+            stackView.translatesAutoresizingMaskIntoConstraints = false
+
+            view.addSubview(stackView)
+
+            NSLayoutConstraint.activate([
+                stackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -16)
+            ])
+        }
     
     @objc private func deleteButtonTapped() {
         isDeleteEnabled = !isDeleteEnabled
@@ -179,7 +187,6 @@ class ViewController: UIViewController {
             } else {
                 // Perform any other action when delete is not enabled
                 // For example, you can show a detail view or do nothing
-                print("Tap on item at index: \(indexPath.item)")
             }
         }
     }
@@ -253,5 +260,64 @@ class ViewController: UIViewController {
            }
            return nil
        }
+    private func showAddItemPopup() {
+            let alertController = UIAlertController(title: "Добавить элемент", message: nil, preferredStyle: .alert)
+
+            alertController.addTextField { textField in
+                textField.placeholder = "Введите новый элемент"
+            }
+
+            let addAction = UIAlertAction(title: "Добавить", style: .default) { [weak self] _ in
+                if let newItem = alertController.textFields?.first?.text, !newItem.isEmpty {
+                    // Add the new item to the data source
+                    self?.dataSource.data.append(newItem)
+
+                    // Update the collection view
+                    let newIndexPath = IndexPath(item: self?.dataSource.data.count ?? 0, section: 0)
+                    self?.dataSource.data.append("New Item") // Здесь добавляем новый элемент в массив данных
+                    self?.collectionView.insertItems(at: [newIndexPath])
+
+
+                }
+            }
+
+            let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler: nil)
+
+            alertController.addAction(addAction)
+            alertController.addAction(cancelAction)
+
+            present(alertController, animated: true, completion: nil)
+        }
+    @objc private func addButtonTapped() {
+        let alertController = UIAlertController(title: "Добавить элемент", message: nil, preferredStyle: .alert)
+        alertController.addTextField { textField in
+            textField.placeholder = "Введите название"
+        }
+        
+        let addAction = UIAlertAction(title: "Добавить", style: .default) { [weak self, weak alertController] _ in
+            guard let textField = alertController?.textFields?.first, let newItem = textField.text else {
+                return
+            }
+            self?.addNewItem(newItem: newItem)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler: nil)
+        
+        alertController.addAction(addAction)
+        alertController.addAction(cancelAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+
+    private func addNewItem(newItem: String) {
+        dataSource.data.append(newItem) // Добавляем новый элемент в массив данных
+        
+        let newIndexPath = IndexPath(item: dataSource.data.count - 1, section: 0)
+        collectionView.performBatchUpdates({ [weak self] in
+            self?.collectionView.insertItems(at: [newIndexPath])
+        }, completion: nil)
+    }
+
+
 }
 
