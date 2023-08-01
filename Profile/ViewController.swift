@@ -146,7 +146,7 @@ class ViewController: UIViewController {
                         widthDimension: .fractionalWidth(1.0),
                         heightDimension: layoutSize.heightDimension
                     ),
-                    subitems: Array(repeating: .init(layoutSize: layoutSize), count: 6) // Repeat the layoutSize 6 times
+                    subitems: Array(repeating: .init(layoutSize: layoutSize), count: 6)
                 )
                 group.interItemSpacing = .fixed(12)
 
@@ -167,26 +167,22 @@ class ViewController: UIViewController {
                     collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                     collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                     collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-                    collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5) // Здесь collectionView будет занимать половину высоты экрана
+                    collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5)
                 ])
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleTap(_:)))
                 collectionView.addGestureRecognizer(tapGestureRecognizer)
         }
     @objc private func handleTap(_ sender: UITapGestureRecognizer) {
-        // Get the tapped point in the collection view
         let tapLocation = sender.location(in: collectionView)
 
-        // Find the item index that was tapped
         if let indexPath = collectionView.indexPathForItem(at: tapLocation) {
             if isDeleteEnabled {
-                // Remove the tapped item from the data source
+
                 dataSource.data.remove(at: indexPath.item)
 
-                // Update the collection view
                 collectionView.deleteItems(at: [indexPath])
             } else {
-                // Perform any other action when delete is not enabled
-                // For example, you can show a detail view or do nothing
+
             }
         }
     }
@@ -225,7 +221,6 @@ class ViewController: UIViewController {
         }
 
         private func setupViews() {
-            // Настройка внешнего вида ячейки, включая UILabel и UIButton
             textLabel.translatesAutoresizingMaskIntoConstraints = false
             deleteButton.translatesAutoresizingMaskIntoConstraints = false
             
@@ -241,10 +236,8 @@ class ViewController: UIViewController {
     private func deleteAction(for indexPath: IndexPath) -> UIContextualAction {
         let action = UIContextualAction(style: .destructive, title: "Удалить") { [weak self] (action, view, completion) in
             if self?.isDeleteEnabled == true {
-                // Удалите элемент из источника данных
                 self?.dataSource.data.remove(at: indexPath.item)
 
-                // Обновите коллекцию
                 self?.collectionView.deleteItems(at: [indexPath])
             }
             completion(true)
@@ -252,7 +245,6 @@ class ViewController: UIViewController {
         return action
     }
 
-       // Реализуйте делегат UICollectionViewDelegate для отображения свайпов
        func collectionView(_ collectionView: UICollectionView, trailingSwipeActionsConfigurationForItemAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
            if isDeleteEnabled {
                let delete = deleteAction(for: indexPath)
@@ -260,34 +252,6 @@ class ViewController: UIViewController {
            }
            return nil
        }
-    private func showAddItemPopup() {
-            let alertController = UIAlertController(title: "Добавить элемент", message: nil, preferredStyle: .alert)
-
-            alertController.addTextField { textField in
-                textField.placeholder = "Введите новый элемент"
-            }
-
-            let addAction = UIAlertAction(title: "Добавить", style: .default) { [weak self] _ in
-                if let newItem = alertController.textFields?.first?.text, !newItem.isEmpty {
-                    // Add the new item to the data source
-                    self?.dataSource.data.append(newItem)
-
-                    // Update the collection view
-                    let newIndexPath = IndexPath(item: self?.dataSource.data.count ?? 0, section: 0)
-                    self?.dataSource.data.append("New Item") // Здесь добавляем новый элемент в массив данных
-                    self?.collectionView.insertItems(at: [newIndexPath])
-
-
-                }
-            }
-
-            let cancelAction = UIAlertAction(title: "Отмена", style: .cancel, handler: nil)
-
-            alertController.addAction(addAction)
-            alertController.addAction(cancelAction)
-
-            present(alertController, animated: true, completion: nil)
-        }
     @objc private func addButtonTapped() {
         let alertController = UIAlertController(title: "Добавить элемент", message: nil, preferredStyle: .alert)
         alertController.addTextField { textField in
