@@ -8,6 +8,8 @@
 import UIKit
 
 class ViewController: UIViewController {
+    private var collectionView: UICollectionView!
+        private var dataSource: MyDataSource!
     override func viewDidLoad() {
         super.viewDidLoad()
         let headText: UILabel = {
@@ -91,9 +93,101 @@ class ViewController: UIViewController {
             city.topAnchor.constraint(equalTo: job.bottomAnchor, constant: 20).isActive = true
             city.widthAnchor.constraint(equalTo: view.widthAnchor).isActive = true
         }
-        
+        setupCollectionView()
+                loadData()
     }
 
-    
+    private func setupCollectionView() {
+            let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+                let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                      heightDimension: .fractionalHeight(1.0))
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+                
+                let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                                       heightDimension: .fractionalWidth(0.2)) // Здесь устанавливаем высоту группы как 1/5 часть экрана
+                
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
+                
+                let section = NSCollectionLayoutSection(group: group)
+                return section
+            }
+            
+            collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: layout)
+            collectionView.backgroundColor = .white
+            collectionView.register(MyCell.self, forCellWithReuseIdentifier: "MyCell")
+            dataSource = MyDataSource()
+            collectionView.dataSource = dataSource
+            view.addSubview(collectionView)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+                NSLayoutConstraint.activate([
+                    collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                    collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+                    collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+                    collectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.5) // Здесь collectionView будет занимать половину высоты экрана
+                ])
+        }
+        
+        private func loadData() {
+            // Загружаем данные и обновляем dataSource
+            dataSource.data = ["Item 1", "Item 2", "Item 3", "Item 4", "Item 5"]
+            collectionView.reloadData()
+        }
+    class MyDataSource: NSObject, UICollectionViewDataSource {
+        var data: [String] = []
+        
+        func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+            return data.count
+        }
+        
+        func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath) as! MyCell
+            cell.textLabel.text = data[indexPath.item]
+            cell.deleteButton.tag = indexPath.item
+            cell.deleteButton.addTarget(self, action: #selector(deleteButtonTapped(_:)), for: .touchUpInside)
+            return cell
+        }
+        
+        @objc private func deleteButtonTapped(_ sender: UIButton) {
+            let index = sender.tag
+            if index < data.count {
+                data.remove(at: index) // Удаление элемента из массива
+//                collectionView?.deleteItems(at: [IndexPath(item: index, section: 0)]) // Обновление collectionView
+            }
+        }
+    }
+    class MyCell: UICollectionViewCell {
+        let textLabel = UILabel()
+        let deleteButton = UIButton(type: .system)
+
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            setupViews()
+        }
+        
+        required init?(coder aDecoder: NSCoder) {
+            super.init(coder: aDecoder)
+            setupViews()
+        }
+
+        private func setupViews() {
+            // Настройка внешнего вида ячейки, включая UILabel и UIButton
+            textLabel.translatesAutoresizingMaskIntoConstraints = false
+            deleteButton.translatesAutoresizingMaskIntoConstraints = false
+            
+            contentView.addSubview(textLabel)
+            contentView.addSubview(deleteButton)
+            
+            NSLayoutConstraint.activate([
+                textLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+                textLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+                
+                deleteButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+                deleteButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            ])
+            
+            deleteButton.setTitle("Удалить", for: .normal)
+        }
+    }
+
 }
 
